@@ -12,6 +12,13 @@ ENV PATH="/opt/venv/bin:$PATH" \
     IBEAM_CHROME_DRIVER_PATH="/usr/bin/chromedriver" \
     PYTHONPATH="${PYTHONPATH}:/srv:/srv/ibeam"
 
+# install tailscale
+RUN apt-get update && apt-get install -y ca-certificates iptables ip6tables
+# Copy Tailscale binaries from the tailscale image on Docker Hub.
+COPY --from=docker.io/tailscale/tailscale:stable /usr/local/bin/tailscaled /app/tailscaled
+COPY --from=docker.io/tailscale/tailscale:stable /usr/local/bin/tailscale /app/tailscale
+RUN mkdir -p /var/run/tailscale /var/cache/tailscale /var/lib/tailscale
+
 COPY requirements.txt /srv/requirements.txt
 
 RUN \

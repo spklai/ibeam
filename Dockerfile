@@ -2,10 +2,10 @@ FROM python:3.11.3-slim-bullseye
 
 ENV PATH="/opt/venv/bin:$PATH" \
     JAVA_HOME="/usr/lib/jvm/default-java" \
-    USER_ID="1000" \
-    GROUP_ID="1000" \
-    USER_NAME="basic_user" \
-    GROUP_NAME="basic_group" \
+    # USER_ID="1000" \
+    # GROUP_ID="1000" \
+    # USER_NAME="basic_user" \
+    # GROUP_NAME="basic_group" \
     SRC_ROOT="/srv/ibeam" \
     OUTPUTS_DIR="/srv/outputs" \
     IBEAM_GATEWAY_DIR="/srv/clientportal.gw" \
@@ -13,7 +13,8 @@ ENV PATH="/opt/venv/bin:$PATH" \
     PYTHONPATH="${PYTHONPATH}:/srv:/srv/ibeam"
 
 # install tailscale
-RUN apt-get update && apt-get install -y ca-certificates iptables ip6tables
+RUN apt-get update && apt-get install -y ca-certificates iptables iproute2
+RUN mkdir -p /app
 # Copy Tailscale binaries from the tailscale image on Docker Hub.
 COPY --from=docker.io/tailscale/tailscale:stable /usr/local/bin/tailscaled /app/tailscaled
 COPY --from=docker.io/tailscale/tailscale:stable /usr/local/bin/tailscale /app/tailscale
@@ -26,13 +27,13 @@ RUN \
     python -m venv /opt/venv && \
     mkdir -p /usr/share/man/man1 $OUTPUTS_DIR $IBEAM_GATEWAY_DIR $SRC_ROOT && \
     # Create basic user
-    addgroup --gid $GROUP_ID $GROUP_NAME && \
-    adduser --disabled-password --gecos "" --uid $USER_ID --gid $GROUP_ID --shell /bin/bash $USER_NAME && \
+    # addgroup --gid $GROUP_ID $GROUP_NAME && \
+    # adduser --disabled-password --gecos "" --uid $USER_ID --gid $GROUP_ID --shell /bin/bash $USER_NAME && \
     # Install apt packages
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y default-jre dbus-x11 xfonts-base xfonts-100dpi \
-        xfonts-75dpi xfonts-cyrillic xfonts-scalable xorg xvfb gtk2-engines-pixbuf nano curl iputils-ping \
-        chromium chromium-driver build-essential && \
+    xfonts-75dpi xfonts-cyrillic xfonts-scalable xorg xvfb gtk2-engines-pixbuf nano curl iputils-ping \
+    chromium chromium-driver build-essential && \
     # Install python packages
     pip install --upgrade pip setuptools wheel && \
     pip install -r /srv/requirements.txt && \
@@ -47,12 +48,12 @@ RUN \
     # Create environment activation script
     echo "/opt/venv/bin/activate" >> $SRC_ROOT/activate.sh && \
     # Update file ownership and permissions
-    chown -R $USER_NAME:$GROUP_NAME $SRC_ROOT $OUTPUTS_DIR $IBEAM_GATEWAY_DIR && \
+    # chown -R $USER_NAME:$GROUP_NAME $SRC_ROOT $OUTPUTS_DIR $IBEAM_GATEWAY_DIR && \
     chmod 744 /opt/venv/bin/activate /srv/ibeam/run.sh $SRC_ROOT/activate.sh    
 
 WORKDIR $SRC_ROOT
 
-USER $USER_NAME
+# USER $USER_NAME
 
 #CMD python ./ibeam_starter.py
 #ENTRYPOINT ["/srv/ibeam/run.sh"]

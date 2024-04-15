@@ -1,0 +1,29 @@
+# fly.toml app configuration file generated for fly-ibeam on 2024-04-14T16:14:14-07:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'fly-ibeam'
+primary_region = 'ewr'
+kill_signal = "SIGTERM"
+kill_timeout = 10
+
+
+[build]
+
+[deploy]
+strategy = 'immediate'
+
+[http_service]
+internal_port = 5001
+force_https = true
+auto_stop_machines = true
+auto_start_machines = true
+min_machines_running = 1
+max_machines_running = 1
+processes = ['app']
+
+[[vm]]
+memory = '2gb'
+cpu_kind = 'shared'
+cpus = 1

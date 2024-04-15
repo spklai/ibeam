@@ -4,6 +4,8 @@ import os
 import sys
 from pathlib import Path
 
+from ibeam.src.utils.signal_utils import signal_handler
+
 def add_to_path():
     _this_filedir = os.path.abspath(os.path.dirname(__file__))
     sys.path.insert(0, str(Path(_this_filedir).parent))
@@ -43,6 +45,8 @@ def parse_args():
 
 
 if __name__ == '__main__':
+    import signal
+    signal.signal(signal.SIGTERM, signal_handler)
     cnf = Config(var.all_variables)
 
     from ibeam.src import logs
